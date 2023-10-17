@@ -1,7 +1,7 @@
 # JGB37 motor
 
 This code add driver for JGB37-3650 motor and encoder together with Arduino Leonardo.
-
+```
 MOTOR_RIGHT_SPD         ---- blue  ---- 6
 MOTOR_RIGHT_DIRECTION   ---- white ---- 7
 MOTOR_LEFT_DIRECTION    ---- white ---- 8
@@ -11,7 +11,7 @@ JGB37_ENC_LEFT          ---- yellow --- 3
 
 MOTOR PWR ---- red ---- +6V/+12V/+24V
 MOTOR GND ---- black --- GND ---- Arduino GND
-
+```
 Connect to Arduino serial monitor 57600. Line ending CR
 The encoder in this implementation counts the pulses, but pays no attention to the direction of the motor.
 
