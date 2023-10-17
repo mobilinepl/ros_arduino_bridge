@@ -11,6 +11,13 @@
   #define LEFT_MOTOR_ENABLE 13
 #endif
 
+#ifdef JGB37_MOTOR
+  #define MOTOR_RIGHT_SPD 6
+  #define MOTOR_RIGHT_DIRECTION 7
+  #define MOTOR_LEFT_DIRECTION  8
+  #define MOTOR_LEFT_SPD 9
+#endif
+
 void initMotorController();
 void setMotorSpeed(int i, int spd);
 void setMotorSpeeds(int leftSpeed, int rightSpeed);

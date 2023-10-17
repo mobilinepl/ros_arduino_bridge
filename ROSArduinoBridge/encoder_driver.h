@@ -13,6 +13,14 @@
   #define RIGHT_ENC_PIN_A PC4  //pin A4
   #define RIGHT_ENC_PIN_B PC5   //pin A5
 #endif
+
+#ifdef JGB37_ENCODER
+  #define JGB37_ENC_RIGHT 2
+  #define JGB37_ENC_LEFT 3
+  void encLeftISR();
+  void encRightISR();
+  void initEncoder();
+#endif
    
 long readEncoder(int i);
 void resetEncoder(int i);
