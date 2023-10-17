@@ -60,10 +60,17 @@
    //#define ROBOGAIA
    
    /* Encoders directly attached to Arduino board */
-   #define ARDUINO_ENC_COUNTER
+   //#define ARDUINO_ENC_COUNTER
 
    /* L298 Motor driver*/
-   #define L298_MOTOR_DRIVER
+   //#define L298_MOTOR_DRIVER
+
+  /* JGB37 Motor*/
+   #define JGB37_MOTOR
+
+  /* JGB37 Encoder*/
+   #define JGB37_ENCODER
+
 #endif
 
 //#define USE_SERVOS  // Enable use of PWM servos as defined in servos.h
@@ -271,9 +278,11 @@ void setup() {
     
     // enable PCINT1 and PCINT2 interrupt in the general interrupt mask
     PCICR |= (1 << PCIE1) | (1 << PCIE2);
-  #endif
-  initMotorController();
-  resetPID();
+#elif defined JGB37_ENCODER
+  initEncoder();
+#endif
+    initMotorController();
+    resetPID();
 #endif
 
 /* Attach servos if used */
