@@ -8,6 +8,9 @@
    ************************************************************ */
    
 #ifdef USE_BASE
+#include <Arduino.h>
+#include "commands.h"
+#include "encoder_driver.h"
 
 #ifdef ROBOGAIA
   /* The Robogaia Mega Encoder shield */

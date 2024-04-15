@@ -12,10 +12,10 @@
 #endif
 
 #ifdef JGB37_MOTOR
-  #define MOTOR_RIGHT_SPD 6
-  #define MOTOR_RIGHT_DIRECTION 7
-  #define MOTOR_LEFT_DIRECTION  8
-  #define MOTOR_LEFT_SPD 9
+  #define MOTOR_RIGHT_SPD 25
+  #define MOTOR_RIGHT_DIRECTION 26
+  #define MOTOR_LEFT_DIRECTION  32
+  #define MOTOR_LEFT_SPD 33
 #endif
 
 void initMotorController();

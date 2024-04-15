@@ -15,8 +15,8 @@
 #endif
 
 #ifdef JGB37_ENCODER
-  #define JGB37_ENC_RIGHT 2
-  #define JGB37_ENC_LEFT 3
+  #define JGB37_ENC_RIGHT 18
+  #define JGB37_ENC_LEFT 19
   void encLeftISR();
   void encRightISR();
   void initEncoder();

@@ -77,13 +77,13 @@
 #undef USE_SERVOS     // Disable use of PWM servos
 
 /* Serial port baud rate */
-#define BAUDRATE     57600
+#define BAUDRATE     115200
 
 /* Maximum PWM signal */
 #define MAX_PWM        255
 
 #if defined(ARDUINO) && ARDUINO >= 100
-#include "Arduino.h"
+#include <Arduino.h>
 #else
 #include "WProgram.h"
 #endif
@@ -129,7 +129,7 @@
 
 // A pair of varibles to help parse serial commands (thanks Fergs)
 int arg = 0;
-int index = 0;
+int ndx = 0;
 
 // Variable to hold an input character
 char chr;
@@ -147,17 +147,17 @@ long arg2;
 
 /* Clear the current command parameters */
 void resetCommand() {
-  cmd = NULL;
+  cmd = '\0';
   memset(argv1, 0, sizeof(argv1));
   memset(argv2, 0, sizeof(argv2));
   arg1 = 0;
   arg2 = 0;
   arg = 0;
-  index = 0;
+  ndx = 0;
 }
 
 /* Run a command.  Commands are defined in commands.h */
-int runCommand() {
+void runCommand() {
   int i = 0;
   char *p = argv1;
   char *str;
@@ -235,7 +235,7 @@ int runCommand() {
     Serial.println("OK"); 
     break;
   case UPDATE_PID:
-    while ((str = strtok_r(p, ":", &p)) != '\0') {
+    while ((str = strtok_r(p, ":", &p)) != NULL) {
        pid_args[i] = atoi(str);
        i++;
     }
@@ -309,8 +309,8 @@ void loop() {
 
     // Terminate a command with a CR
     if (chr == 13) {
-      if (arg == 1) argv1[index] = NULL;
-      else if (arg == 2) argv2[index] = NULL;
+      if (arg == 1) argv1[ndx] = '\0';
+      else if (arg == 2) argv2[ndx] = '\0';
       runCommand();
       resetCommand();
     }
@@ -319,9 +319,9 @@ void loop() {
       // Step through the arguments
       if (arg == 0) arg = 1;
       else if (arg == 1)  {
-        argv1[index] = NULL;
+        argv1[ndx] = '\0';
         arg = 2;
-        index = 0;
+        ndx = 0;
       }
       continue;
     }
@@ -332,12 +332,12 @@ void loop() {
       }
       else if (arg == 1) {
         // Subsequent arguments can be more than one character
-        argv1[index] = chr;
-        index++;
+        argv1[ndx] = chr;
+        ndx++;
       }
       else if (arg == 2) {
-        argv2[index] = chr;
-        index++;
+        argv2[ndx] = chr;
+        ndx++;
       }
     }
   }

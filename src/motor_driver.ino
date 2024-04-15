@@ -8,7 +8,10 @@
    *************************************************************/
 
 #ifdef USE_BASE
-   
+#include <Arduino.h>
+#include "commands.h"
+#include "motor_driver.h"
+
 #ifdef POLOLU_VNH5019
   /* Include the Pololu library */
   #include "DualVNH5019MotorShield.h"
