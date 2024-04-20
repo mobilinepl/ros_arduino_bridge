@@ -45,26 +45,13 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
+#include <Arduino.h>
+
 #define USE_BASE      // Enable the base controller code
 //#undef USE_BASE     // Disable the base controller code
 
 /* Define the motor controller and encoder library you are using */
 #ifdef USE_BASE
-   /* The Pololu VNH5019 dual motor driver shield */
-   //#define POLOLU_VNH5019
-
-   /* The Pololu MC33926 dual motor driver shield */
-   //#define POLOLU_MC33926
-
-   /* The RoboGaia encoder shield */
-   //#define ROBOGAIA
-   
-   /* Encoders directly attached to Arduino board */
-   //#define ARDUINO_ENC_COUNTER
-
-   /* L298 Motor driver*/
-   //#define L298_MOTOR_DRIVER
-
   /* JGB37 Motor*/
    #define JGB37_MOTOR
 
@@ -73,20 +60,11 @@
 
 #endif
 
-//#define USE_SERVOS  // Enable use of PWM servos as defined in servos.h
-#undef USE_SERVOS     // Disable use of PWM servos
-
 /* Serial port baud rate */
 #define BAUDRATE     115200
 
 /* Maximum PWM signal */
 #define MAX_PWM        255
-
-#if defined(ARDUINO) && ARDUINO >= 100
-#include <Arduino.h>
-#else
-#include "WProgram.h"
-#endif
 
 /* Include definition of serial commands */
 #include "commands.h"
@@ -94,11 +72,6 @@
 /* Sensor functions */
 #include "sensors.h"
 
-/* Include servo support if required */
-#ifdef USE_SERVOS
-   #include <Servo.h>
-   #include "servos.h"
-#endif
 
 #ifdef USE_BASE
   /* Motor driver function definitions */
@@ -121,7 +94,7 @@
 
   /* Stop the robot if it hasn't received a movement command
    in this number of milliseconds */
-  #define AUTO_STOP_INTERVAL 2000
+  #define AUTO_STOP_INTERVAL 5000
   long lastMotorCommand = AUTO_STOP_INTERVAL;
 #endif
 
@@ -192,15 +165,6 @@ void runCommand() {
   case PING:
     Serial.println(Ping(arg1));
     break;
-#ifdef USE_SERVOS
-  case SERVO_WRITE:
-    servos[arg1].setTargetPosition(arg2);
-    Serial.println("OK");
-    break;
-  case SERVO_READ:
-    Serial.println(servos[arg1].getServo().read());
-    break;
-#endif
     
 #ifdef USE_BASE
   case READ_ENCODERS:
@@ -258,43 +222,13 @@ void setup() {
 
 // Initialize the motor controller if used */
 #ifdef USE_BASE
-  #ifdef ARDUINO_ENC_COUNTER
-    //set as inputs
-    DDRD &= ~(1<<LEFT_ENC_PIN_A);
-    DDRD &= ~(1<<LEFT_ENC_PIN_B);
-    DDRC &= ~(1<<RIGHT_ENC_PIN_A);
-    DDRC &= ~(1<<RIGHT_ENC_PIN_B);
-    
-    //enable pull up resistors
-    PORTD |= (1<<LEFT_ENC_PIN_A);
-    PORTD |= (1<<LEFT_ENC_PIN_B);
-    PORTC |= (1<<RIGHT_ENC_PIN_A);
-    PORTC |= (1<<RIGHT_ENC_PIN_B);
-    
-    // tell pin change mask to listen to left encoder pins
-    PCMSK2 |= (1 << LEFT_ENC_PIN_A)|(1 << LEFT_ENC_PIN_B);
-    // tell pin change mask to listen to right encoder pins
-    PCMSK1 |= (1 << RIGHT_ENC_PIN_A)|(1 << RIGHT_ENC_PIN_B);
-    
-    // enable PCINT1 and PCINT2 interrupt in the general interrupt mask
-    PCICR |= (1 << PCIE1) | (1 << PCIE2);
-#elif defined JGB37_ENCODER
+#ifdef JGB37_ENCODER
   initEncoder();
 #endif
     initMotorController();
     resetPID();
 #endif
 
-/* Attach servos if used */
-  #ifdef USE_SERVOS
-    int i;
-    for (i = 0; i < N_SERVOS; i++) {
-      servos[i].initServo(
-          servoPins[i],
-          stepDelay[i],
-          servoInitPosition[i]);
-    }
-  #endif
 }
 
 /* Enter the main loop.  Read and parse input from the serial port
@@ -302,6 +236,7 @@ void setup() {
    interval and check for auto-stop conditions.
 */
 void loop() {
+  
   while (Serial.available() > 0) {
     
     // Read the next character
@@ -341,27 +276,21 @@ void loop() {
       }
     }
   }
-  
-// If we are using base control, run a PID calculation at the appropriate intervals
-#ifdef USE_BASE
-  if (millis() > nextPID) {
-    updatePID();
-    nextPID += PID_INTERVAL;
-  }
-  
-  // Check to see if we have exceeded the auto-stop interval
-  if ((millis() - lastMotorCommand) > AUTO_STOP_INTERVAL) {;
-    setMotorSpeeds(0, 0);
-    moving = 0;
-  }
-#endif
 
-// Sweep servos
-#ifdef USE_SERVOS
-  int i;
-  for (i = 0; i < N_SERVOS; i++) {
-    servos[i].doSweep();
-  }
-#endif
+
+  // If we are using base control, run a PID calculation at the appropriate intervals
+  #ifdef USE_BASE
+    if (millis() > nextPID) {
+      updatePID();
+      nextPID += PID_INTERVAL;
+    }
+    
+    // Check to see if we have exceeded the auto-stop interval
+    if ((millis() - lastMotorCommand) > AUTO_STOP_INTERVAL) {
+      setMotorSpeeds(0, 0);
+      resetPID();
+      moving = 0;
+    }
+  #endif
+
 }
-
